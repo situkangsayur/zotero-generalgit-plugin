@@ -151,7 +151,7 @@ ZoteroGitSync.Git = {
 		let has = re => re.test(text);
 		let hint = '';
 		if (has(/git: 'lfs' is not a git command|git-lfs.*not found/i)) {
-			hint = 'Git LFS is not installed. Install git-lfs (https://git-lfs.com), or turn off Git LFS in Settings → Git Sync.';
+			hint = 'Git LFS is not installed. Install git-lfs (https://git-lfs.com), or turn off "Store files larger than … with Git LFS" in Settings → Git Sync.';
 		}
 		else if (has(/Host key verification failed/i)) {
 			hint = 'SSH does not know this server yet. Connect once from a terminal (for example: ssh -T git@your-host) '
@@ -183,11 +183,12 @@ ZoteroGitSync.Git = {
 			.map(line => line.replace(/\r.*$/, '').trim())
 			.filter(line => line && !/^(Enumerating|Counting|Compressing|Writing|Total|Delta|Receiving|Resolving|remote: (Counting|Compressing|Enumerating|Total))/i.test(line));
 		let detail = lines.slice(-4).join(' ');
-		let command = args.find(arg => !arg.startsWith('-')) || 'git';
+		let command = args.find(arg => !arg.startsWith('-'));
+		let label = command ? `git ${command}` : 'git';
 		if (hint) {
-			return detail ? `${hint}\n(git ${command}: ${detail})` : hint;
+			return detail ? `${hint}\n(${label}: ${detail})` : hint;
 		}
-		return `git ${command} failed${detail ? `: ${detail}` : ''}`;
+		return `${label} failed${detail ? `: ${detail}` : ''}`;
 	},
 };
 

@@ -35,8 +35,10 @@ pref("extensions.zotero-git-sync.includeAttachments", true);
 pref("extensions.zotero-git-sync.includeLinkedFiles", true);
 // 0 means no limit of our own
 pref("extensions.zotero-git-sync.maxAttachmentMB", 0);
-// Files above the threshold go to Git LFS instead of Git
-pref("extensions.zotero-git-sync.lfsEnabled", true);
+// Off by default: git-lfs is an extra install, and most self-hosted servers take
+// large files in Git anyway. When on, files above the threshold go to Git LFS;
+// if git-lfs turns out not to be installed, the sync goes on without it.
+pref("extensions.zotero-git-sync.lfsEnabled", false);
 pref("extensions.zotero-git-sync.lfsThresholdMB", 50);
 // Largest file committed to Git itself when it can't go to LFS. GitHub and
 // GitLab.com refuse files over 100 MB; a self-hosted server may take more.

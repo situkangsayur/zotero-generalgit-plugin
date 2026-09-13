@@ -544,7 +544,8 @@ ZoteroGitSync.Exporter = {
 			if (!lfs && source.size > config.maxGitFileBytes) {
 				out.warnings.push(
 					`Skipped ${label}/${source.relPath}: ${ZoteroGitSync.Utils.formatSize(source.size)} is over the `
-					+ `${ZoteroGitSync.Utils.formatSize(config.maxGitFileBytes)} limit for files in Git. Turn on Git LFS to sync it.`
+					+ `${ZoteroGitSync.Utils.formatSize(config.maxGitFileBytes)} limit for files in Git. Raise "Largest file to commit `
+					+ 'to Git itself" if your server accepts larger files, or turn on Git LFS (needs git-lfs installed).'
 				);
 				entry.status = 'partial';
 				continue;

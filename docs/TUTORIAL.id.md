@@ -8,20 +8,21 @@ Kira-kira lima belas menit, ditambah waktu unggah PDF Anda.
 
 ---
 
-## 1. Pasang git (dan git-lfs)
+## 1. Pasang git
 
 Plugin menjalankan program `git` di komputer Anda.
 
 | Sistem | Cara pasang |
 | --- | --- |
-| Windows | [Git for Windows](https://git-scm.com/download/win) — sudah termasuk Git LFS |
-| macOS | `brew install git git-lfs`, atau `xcode-select --install` untuk git saja |
-| Debian/Ubuntu | `sudo apt install git git-lfs` |
-| Fedora | `sudo dnf install git git-lfs` |
-| Arch | `sudo pacman -S git git-lfs` |
+| Windows | [Git for Windows](https://git-scm.com/download/win) |
+| macOS | `brew install git`, atau `xcode-select --install` |
+| Debian/Ubuntu | `sudo apt install git` |
+| Fedora | `sudo dnf install git` |
+| Arch | `sudo pacman -S git` |
 
-Git LFS dipakai untuk lampiran di atas 50 MB. Kalau tidak dipasang, matikan *Store files
-larger than … with Git LFS* di langkah 5.
+Git LFS **tidak** diperlukan: lampiran masuk ke Git biasa. Hanya kalau host Anda menolak berkas
+besar (GitHub dan GitLab.com menolak berkas di atas 100 MB), pasang juga `git-lfs` dan nyalakan
+*Store files larger than … with Git LFS* di langkah 5.
 
 Tutup dan buka lagi Zotero setelah memasang git.
 
@@ -112,8 +113,10 @@ Isi user name, tempel token, klik **Save token**, lalu **Test connection** lagi.
 ### What gets synced
 
 Semuanya menyala secara bawaan: metadata item, catatan Markdown, catatan anak, pustaka grup,
-berkas lampiran dan linked file. Berkas di atas 50 MB masuk Git LFS. Git menyimpan setiap
-versi berkas, jadi mengganti PDF membuat repositori terus bertambah besar.
+berkas lampiran dan linked file, semuanya masuk Git biasa sampai *Largest file to commit to Git
+itself* (100 MB). Di server sendiri, naikkan angka itu kalau ada berkas lebih besar; di GitHub
+atau GitLab.com, nyalakan Git LFS untuk berkas besar. Git menyimpan setiap versi berkas, jadi
+mengganti PDF membuat repositori terus bertambah besar.
 
 ### Commits
 
@@ -139,7 +142,7 @@ Pada sinkronisasi pertama:
 
 1. **Memeriksa berkas lampiran.** Setiap berkas di-hash sekali; sinkron berikutnya memakai
    hasilnya.
-2. **Berkas besar ke Git LFS.**
+2. **Berkas besar ke Git LFS**, hanya kalau LFS dinyalakan.
 3. **Metadata dan catatan** disimpan dan dikirim lebih dulu.
 4. **Berkas lampiran** menyusul bertahap — satu commit dikirim setiap 100 MB atau 1.000
    berkas. Kalau sinkron dibatalkan, gagal, atau Zotero ditutup, semua checkpoint yang sudah
@@ -171,7 +174,7 @@ pengaturan.
 | *The server refused the HTTPS credentials* | Periksa user name dan token, atau pasang credential helper |
 | *The repository was not found* | Periksa alamat; buat repositorinya dulu |
 | *… stopped responding* | git menunggu pertanyaan: pakai pilihan A, B atau C di langkah 3 |
-| *Git LFS is not installed* | Pasang git-lfs, atau matikan Git LFS |
+| *Git LFS is turned on but git-lfs is not installed* | Sinkron tetap jalan tanpa LFS; pasang git-lfs atau matikan LFS |
 | *refused the push because of a size limit or quota* | Turunkan ambang LFS, lewati berkas yang sangat besar, cek batas host |
 
 Nyalakan **Help → Debug Output Logging** sebelum sinkron untuk rincian; baris plugin diawali

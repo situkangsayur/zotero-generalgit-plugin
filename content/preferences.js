@@ -117,7 +117,9 @@ window.ZoteroGitSyncPrefs = {
 			lines.push(`${versions.git} (${gitPath})`);
 			lines.push(versions.lfs
 				? versions.lfs.split(' ')[0]
-				: 'git-lfs is not installed: attachments larger than the LFS threshold will fail to sync.');
+				: config.lfsEnabled
+					? 'git-lfs is not installed: Git LFS is turned on, so large files will be committed to Git directly instead.'
+					: 'git-lfs is not installed (not needed: Git LFS is turned off).');
 
 			let token = await plugin.Prefs.getToken();
 			let [major, minor] = (versions.git.match(/(\d+)\.(\d+)/) || []).slice(1).map(Number);
@@ -151,7 +153,7 @@ window.ZoteroGitSyncPrefs = {
 					+ `Existing branches: ${[...branches.keys()].slice(0, 5).join(', ')}`);
 			}
 			lines.push('Reading works. Write access is checked by the first sync.');
-			this._setStatus(this._testStatus, lines.join('\n'), versions.lfs ? 'ok' : '');
+			this._setStatus(this._testStatus, lines.join('\n'), versions.lfs || !config.lfsEnabled ? 'ok' : '');
 		}
 		catch (e) {
 			Zotero.logError(e);

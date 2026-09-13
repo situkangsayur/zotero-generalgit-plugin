@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-09-13
+
+### Changed
+
+- **Git LFS is optional and off by default.** Every attachment is committed to Git itself, up
+  to *Largest file to commit to Git itself* (100 MB). git-lfs is no longer needed to sync a
+  library with large files. Existing installations that never changed the setting switch to
+  the new default.
+- **No git-lfs, no failure.** With Git LFS turned on but git-lfs missing, the sync now runs
+  without LFS and reports it as a warning, instead of stopping with "Git LFS is not installed"
+  and never syncing.
+- Test connection no longer warns about a missing git-lfs when LFS is off.
+
+### Fixed
+
+- Error messages for git commands without a subcommand read "git git: …".
+- A sync that first imported accepted changes dropped the warnings of that import (files it
+  couldn't restore, for example) from its result and from Settings → Git Sync.
+
 ## [0.1.0] — 2026-09-13
 
 First release. Built from Zotero GitHub Sync 0.3.0, whose exporter, importer, three-way

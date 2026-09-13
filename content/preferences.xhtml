@@ -117,11 +117,12 @@
 			</hbox>
 
 			<html:div class="zgit-hint">
-				Git LFS needs <html:span class="zgit-mono">git-lfs</html:span> installed on this computer
-				and LFS enabled for the repository on the host. GitLab.com and GitHub refuse files over
-				100 MB in Git; a self-hosted server may accept more. Hosts also limit total repository
-				and LFS size -- check your plan. Notes, annotations, collections, saved searches and tag
-				colors are always synced.
+				Git LFS is optional and off by default: every file is committed to Git itself, up to the
+				largest size above. Turn LFS on only if your host refuses large files (GitHub and
+				GitLab.com refuse files over 100 MB) -- it needs <html:span class="zgit-mono">git-lfs</html:span>
+				installed and LFS enabled for the repository; without git-lfs the sync carries on without
+				it. A self-hosted server usually accepts large files: raise the size instead. Notes,
+				annotations, collections, saved searches and tag colors are always synced.
 			</html:div>
 
 			<checkbox label="Remove files from the repository when their items are deleted"

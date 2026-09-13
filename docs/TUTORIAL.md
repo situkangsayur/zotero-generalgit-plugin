@@ -8,20 +8,21 @@ the time your PDFs take to upload.
 
 ---
 
-## 1. Install git (and git-lfs)
+## 1. Install git
 
 The plugin runs the `git` program on your computer.
 
 | System | Install |
 | --- | --- |
-| Windows | [Git for Windows](https://git-scm.com/download/win) — includes Git LFS |
-| macOS | `brew install git git-lfs`, or `xcode-select --install` for git alone |
-| Debian/Ubuntu | `sudo apt install git git-lfs` |
-| Fedora | `sudo dnf install git git-lfs` |
-| Arch | `sudo pacman -S git git-lfs` |
+| Windows | [Git for Windows](https://git-scm.com/download/win) |
+| macOS | `brew install git`, or `xcode-select --install` |
+| Debian/Ubuntu | `sudo apt install git` |
+| Fedora | `sudo dnf install git` |
+| Arch | `sudo pacman -S git` |
 
-Git LFS is for attachments over 50 MB. If you don't install it, turn off *Store files larger
-than … with Git LFS* in step 5.
+Git LFS is **not** needed: attachments go into Git itself. Only if your host refuses large
+files (GitHub and GitLab.com refuse files over 100 MB) install `git-lfs` as well and turn on
+*Store files larger than … with Git LFS* in step 5.
 
 Restart Zotero after installing git, so it sees the new program.
 
@@ -112,8 +113,10 @@ Enter the user name, paste the token, click **Save token**, then **Test connecti
 ### What gets synced
 
 Everything is on by default: item metadata, Markdown notes, child notes, group libraries,
-attachment files and linked files. Files over 50 MB go to Git LFS. Git keeps every version of
-every file, so replacing PDFs grows the repository over time.
+attachment files and linked files, all committed to Git itself up to *Largest file to commit
+to Git itself* (100 MB). On your own server, raise that number if you have bigger files; on
+GitHub or GitLab.com, turn on Git LFS for them instead. Git keeps every version of every file,
+so replacing PDFs grows the repository over time.
 
 ### Commits
 
@@ -138,7 +141,7 @@ and shows a percentage; click it for the progress window.
 On a first sync:
 
 1. **Checking attachment files.** Each file is hashed once; later syncs reuse the result.
-2. **Large files to Git LFS.**
+2. **Large files to Git LFS**, only if you turned LFS on.
 3. **Metadata and notes** are stored and pushed first.
 4. **Attachment files** follow in checkpoints — a commit pushed every 100 MB or 1,000 files.
    If the sync is cancelled, fails or Zotero closes, every pushed checkpoint stays, and the
@@ -169,7 +172,7 @@ The button turns red. Hover over it for the message, or look at **Status** in th
 | *The server refused the HTTPS credentials* | Check the user name and token, or set up a credential helper |
 | *The repository was not found* | Check the address; create the repository first |
 | *… stopped responding* | git waited for a prompt: use option A, B or C from step 3 |
-| *Git LFS is not installed* | Install git-lfs, or turn off Git LFS |
+| *Git LFS is turned on but git-lfs is not installed* | The sync worked without LFS; install git-lfs or turn LFS off |
 | *refused the push because of a size limit or quota* | Lower the LFS threshold, skip very large files, check the host's limits |
 
 Turn on **Help → Debug Output Logging** before syncing for more detail; plugin lines start

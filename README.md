@@ -15,7 +15,7 @@ the computer; both write the same repository format.
 **[Step-by-step tutorial](docs/TUTORIAL.md)** ·
 **[Tutorial (Bahasa Indonesia)](docs/TUTORIAL.id.md)**
 
-> **Status: 0.1.0, first release.** Tested on Zotero 10 (Linux, git 2.55, git-lfs 3.8) with a
+> **Status: 0.1.1.** Tested on Zotero 10 (Linux, git 2.55, git-lfs 3.8) with a
 > scripted run of two computers taking turns on one repository — edits, deletions,
 > conflicts on both sides, a background sync while behind — followed by *Import from Git*
 > into an empty profile that restored every item and file byte for byte, with one file
@@ -37,7 +37,9 @@ the computer; both write the same repository format.
   GitLab, Gitea, Forgejo, Codeberg, Bitbucket Cloud, a plain server over SSH.
 - **Uses your existing sign-in.** SSH keys and agent, or git's credential helper. For HTTPS
   hosts without a helper you can store an access token in Zotero's password manager.
-- **Handles large files.** Files over 50 MB (configurable) go to Git LFS through `git-lfs`.
+- **Handles large files without extra tools.** Every file goes into Git itself, up to a size
+  you set. Git LFS is optional (off by default) for hosts that refuse large files; if it is on
+  but git-lfs isn't installed, the sync carries on without it.
 - **Only sends what changed.** Files are hashed with Git's own blob hash and the hashes are
   cached, so an unchanged library makes no commit and reads no PDFs.
 - **Survives big first syncs.** Metadata and notes are pushed first; attachment files follow
@@ -66,9 +68,9 @@ the computer; both write the same repository format.
   HTTPS token needs 2.31 or newer). Windows:
   [Git for Windows](https://git-scm.com/download/win), which includes Git LFS. macOS:
   `xcode-select --install` or Homebrew. Linux: your package manager.
-- **git-lfs** for attachments over the LFS threshold: [git-lfs.com](https://git-lfs.com) or
-  your package manager. Without it, turn off *Store files larger than … with Git LFS*.
-- A repository on a Git host, with LFS enabled if you use it.
+- **git-lfs** is *not* required. Install it ([git-lfs.com](https://git-lfs.com)) only if you
+  turn on Git LFS for a host that refuses large files.
+- A repository on a Git host.
 
 ## Install
 
@@ -153,10 +155,12 @@ repository is left alone.
 
 ## Large files and host limits
 
-- Files above the LFS threshold (50 MB by default) go to Git LFS. LFS must be enabled for
-  the repository on the host, and `git-lfs` installed on the computer.
-- Without LFS, files larger than *Largest file to commit to Git itself* (100 MB by default,
-  the limit on GitHub and GitLab.com) are skipped with a warning.
+- By default every attachment is committed to Git itself, up to *Largest file to commit to Git
+  itself* (100 MB by default — the limit on GitHub and GitLab.com). Larger files are skipped
+  with a warning; on a self-hosted server that accepts them, raise the limit.
+- Optional: turn on *Store files larger than … with Git LFS* (50 MB by default). That needs
+  `git-lfs` on the computer and LFS enabled for the repository. If git-lfs is missing, the
+  sync still runs — without LFS — and says so.
 - Hosts limit repository size, LFS storage and push size, and the limits differ by host and
   plan. Check your host's documentation before backing up a large library. When the host
   refuses a push, the sync stops with a message saying so; checkpoints already pushed stay.
@@ -190,7 +194,7 @@ it again.
 | The server refused the HTTPS credentials | Set up a credential helper, or enter a user name and token under HTTPS sign-in |
 | The repository was not found | Check the address; create the repository on the host first |
 | stopped responding | git was waiting for a prompt: use an SSH agent or a credential helper |
-| Git LFS is not installed | Install git-lfs, or turn off Git LFS |
+| Git LFS is turned on but git-lfs is not installed | Sync worked without LFS. Install git-lfs, or turn Git LFS off |
 | refused the push because of a size limit | Lower the LFS threshold, skip very large attachments, check the host's limits |
 
 For more detail, turn on **Help → Debug Output Logging**; plugin lines start with
@@ -213,7 +217,7 @@ berkas PDF/buku — ke repositori Git di **host apa pun**: GitLab, Gitea, Forgej
 Bitbucket, atau server sendiri. Plugin memakai `git` yang terpasang di komputer, jadi cara
 masuknya sama seperti `git clone` di terminal: kunci SSH atau credential helper HTTPS.
 
-- **Syarat:** git terpasang; git-lfs untuk berkas besar (default di atas 50 MB).
+- **Syarat:** cukup git terpasang. git-lfs tidak wajib (Git LFS mati secara bawaan).
 - **Langkah:** buat repositori kosong di host → pastikan `git ls-remote <alamat>` jalan
   tanpa bertanya password → pasang XPI (Tools → Plugins → Install Plugin From File…) → isi
   *Repository address* di Settings → Git Sync → *Test connection* → klik tombol Git Sync.

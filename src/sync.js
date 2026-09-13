@@ -434,7 +434,7 @@ ZoteroGitSync.Sync = {
 	},
 
 
-	async _runSync({ config, token, items, trigger, silent = false, forceReview = false, preset = null }) {
+	async _runSync({ config, token, items, trigger, silent = false, forceReview = false, preset = null, carriedWarnings = [] }) {
 		let prefix = config.basePath ? `${config.basePath}/` : '';
 		let Files = ZoteroGitSync.Files;
 		let Utils = ZoteroGitSync.Utils;
@@ -444,14 +444,27 @@ ZoteroGitSync.Sync = {
 
 		// -- 1. Analyse: export, fetch the branch, compare three ways -----------
 
+		let repo = await this.openRepository(config, { token, cancel });
+		let lfsWarning = null;
+		if (config.lfsEnabled && !await repo.lfsAvailable()) {
+			// Asked for LFS, but git-lfs isn't installed here: sync without it
+			// rather than not at all
+			config = { ...config, lfsEnabled: false };
+			lfsWarning = get('warning.lfsMissing', ZoteroGitSync.Utils.formatSize(config.maxGitFileBytes));
+			ZoteroGitSync.warn(lfsWarning);
+		}
+
 		let { files, keepPrefixes, warnings } = await ZoteroGitSync.Exporter.build({
 			config,
 			items,
 			onProgress: message => this._updateProgress({ phase: 'collecting', message }),
 		});
+		if (lfsWarning) {
+			warnings.unshift(lfsWarning);
+		}
+		// The first pass of a sync that imported changes, and what the import reported
+		warnings.unshift(...carriedWarnings);
 		cancel.throwIfCancelled();
-
-		let repo = await this.openRepository(config, { token, cancel });
 
 		this._updateProgress({ phase: 'fetching', message: get('progress.fetching', ZoteroGitSync.Prefs.getRepoLabel(config)) });
 		let head = await repo.fetch({ onProgress: p => this._updateProgress({ phase: 'fetching', done: p.done, total: p.total }) });
@@ -577,7 +590,7 @@ ZoteroGitSync.Sync = {
 				finally {
 					this._suppressChangeTrigger = false;
 				}
-				return this._runSync({ config, token, items, trigger, silent, preset: decisions });
+				return this._runSync({ config, token, items, trigger, silent, preset: decisions, carriedWarnings: warnings });
 			}
 		}
 
