@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] — 2026-09-13
+
+### Fixed
+
+- When the server rejects an access token that *is* saved, the error now says so — naming the
+  user name it was sent with — instead of suggesting to enter a token, which read as if the
+  saved token had been ignored.
+
 ## [0.1.1] — 2026-09-13
 
 ### Changed

@@ -144,9 +144,11 @@ ZoteroGitSync.Git = {
 	 *
 	 * @param {String} stderr
 	 * @param {String[]} args
+	 * @param {Object} [context]
+	 * @param {String|null} [context.tokenUser] - Set when a stored HTTPS token was sent
 	 * @return {String}
 	 */
-	explain(stderr, args = []) {
+	explain(stderr, args = [], { tokenUser = null } = {}) {
 		let text = ZoteroGitSync.Utils.redactURLs(stderr || '');
 		let has = re => re.test(text);
 		let hint = '';
@@ -162,8 +164,12 @@ ZoteroGitSync.Git = {
 				+ 'and make sure the key is loaded in your SSH agent (a key with a passphrase needs the agent).';
 		}
 		else if (has(/terminal prompts disabled|could not read (Username|Password)|Authentication failed|HTTP Basic: Access denied|The requested URL returned error: 40[13]|invalid credentials|Unauthorized/i)) {
-			hint = 'The server refused the HTTPS credentials. Set up a Git credential helper, or enter a user name '
-				+ 'and access token in Settings → Git Sync.';
+			hint = tokenUser !== null
+				? `The server rejected the access token saved in Settings → Git Sync (sent with user name "${tokenUser}"). `
+					+ 'Check that the token was copied completely and hasn\'t expired or been deleted on the host, that it '
+					+ 'can read and write repositories, and that the user name is right -- then save it again.'
+				: 'The server refused the HTTPS credentials. Set up a Git credential helper, or enter a user name '
+					+ 'and access token in Settings → Git Sync.';
 		}
 		else if (has(/Repository not found|does not appear to be a git repository|project you were looking for could not be found|The requested URL returned error: 404|repository .* not found/i)) {
 			hint = 'The repository was not found, or this account cannot see it. Check the repository address, '
@@ -330,6 +336,20 @@ ZoteroGitSync.Repository = class Repository {
 
 	get trackingRef() {
 		return `refs/remotes/origin/${this.branch}`;
+	}
+
+
+	/**
+	 * @return {Boolean} Whether a stored token goes with requests to this remote
+	 */
+	get sendsToken() {
+		let parts = ZoteroGitSync.Utils.parseRemoteURL(this.remoteURL);
+		return !!(this.token && parts && (parts.scheme === 'https' || parts.scheme === 'http'));
+	}
+
+
+	_explain(stderr, args) {
+		return ZoteroGitSync.Git.explain(stderr, args, { tokenUser: this.sendsToken ? (this.httpsUsername || 'oauth2') : null });
 	}
 
 
@@ -512,7 +532,7 @@ ZoteroGitSync.Repository = class Repository {
 		}
 		if (!okExitCodes.includes(exitCode)) {
 			ZoteroGitSync.log(`git ${label} exited with ${exitCode}: ${ZoteroGitSync.Utils.redactURLs(stderr).slice(-2000)}`);
-			throw new ZoteroGitSync.GitError(ZoteroGitSync.Git.explain(stderr, args), { args, exitCode, stderr });
+			throw new ZoteroGitSync.GitError(this._explain(stderr, args), { args, exitCode, stderr });
 		}
 		if (inputError) {
 			throw new ZoteroGitSync.GitError(`git ${args[0]} stopped reading its input: ${inputError.message || inputError}`, { args, exitCode, stderr });
@@ -584,7 +604,7 @@ ZoteroGitSync.Repository = class Repository {
 				await this.run(['update-ref', '-d', this.trackingRef], { okExitCodes: [0, 1] });
 				return null;
 			}
-			throw new ZoteroGitSync.GitError(ZoteroGitSync.Git.explain(result.stderr, ['fetch']), {
+			throw new ZoteroGitSync.GitError(this._explain(result.stderr, ['fetch']), {
 				args: ['fetch'], exitCode: result.exitCode, stderr: result.stderr,
 			});
 		}
@@ -923,7 +943,7 @@ ZoteroGitSync.Repository = class Repository {
 			});
 		}
 		let detail = [result.stderr, rejected || ''].join('\n');
-		throw new ZoteroGitSync.GitError(ZoteroGitSync.Git.explain(detail, ['push']), {
+		throw new ZoteroGitSync.GitError(this._explain(detail, ['push']), {
 			args: ['push'], exitCode: result.exitCode, stderr: detail,
 		});
 	}

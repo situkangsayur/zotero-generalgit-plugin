@@ -117,6 +117,10 @@ try {
 	assert.equal(env.GIT_TERMINAL_PROMPT, '0');
 	const sshRepo = new Repository({ gitPath, gitDir: null, remoteURL: 'git@gitlab.com:me/lib.git', token: 's3cret' });
 	assert.equal(sshRepo._environment().GIT_CONFIG_COUNT, undefined, 'no header for SSH remotes');
+	const denied = 'fatal: could not read Username for \'https://gitea.example.com:3000\': terminal prompts disabled';
+	assert.match(withToken._explain(denied, ['fetch']), /rejected the access token saved.*"me"/);
+	assert.match(new Repository({ gitPath, gitDir: null, remoteURL: 'https://h/x.git' })._explain(denied, ['fetch']), /enter a user name and access token/);
+	assert.match(sshRepo._explain(denied, ['fetch']), /enter a user name and access token/, 'a token is never sent to SSH remotes');
 
 	// -- Cancelling kills a running git ----------------------------------------------
 	const cancel = new CancelToken();

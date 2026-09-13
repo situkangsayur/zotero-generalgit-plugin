@@ -17,6 +17,7 @@
  *   B3  B syncs with a review: BERT takes the repository's version, Mask
  *       R-CNN is imported, Deep Learning (deleted there) is not uploaded again
  *   A3  A syncs with a review and accepts B's note
+ *   X1  (optional, profile C) a wrong saved token must say the token was rejected
  *   C1  C, an empty profile, runs Import from Git; its attachment files must
  *       be byte-identical to A's (ZGIT_LFS=1 puts the large one in Git LFS)
  *
@@ -259,7 +260,7 @@ async function run(step, report) {
 		plugin.Prefs.set('authorEmail', 'a@example.com');
 	}
 	let tokenFile = env('ZGIT_TOKEN_FILE');
-	if (tokenFile && step !== 'X0') {
+	if (tokenFile && step !== 'X0' && step !== 'X1') {
 		plugin.Prefs.set('httpsUsername', env('ZGIT_HTTPS_USER') || '');
 		await plugin.Prefs.setToken((await IOUtils.readUTF8(tokenFile)).trim());
 	}
@@ -336,6 +337,17 @@ async function run(step, report) {
 			report.result = result;
 			if (result.status !== 'error' || !/credentials/i.test(result.error)) {
 				throw new Error(`Expected a credentials error, got ${JSON.stringify(result)}`);
+			}
+			report.after = { message: result.error };
+			return;
+		}
+
+		case 'X1': {
+			await plugin.Prefs.setToken('not-the-right-token');
+			let result = await plugin.Sync.syncNow({ trigger: 'test-X1', silent: true });
+			report.result = result;
+			if (result.status !== 'error' || !/rejected the access token saved/.test(result.error)) {
+				throw new Error(`Expected a rejected-token error, got ${JSON.stringify(result)}`);
 			}
 			report.after = { message: result.error };
 			return;

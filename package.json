@@ -1,6 +1,6 @@
 {
 	"name": "zotero-git-sync",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": true,
 	"description": "Zotero plugin that syncs a library to any Git repository through the system git",
 	"type": "module",

@@ -15,7 +15,7 @@ the computer; both write the same repository format.
 **[Step-by-step tutorial](docs/TUTORIAL.md)** ·
 **[Tutorial (Bahasa Indonesia)](docs/TUTORIAL.id.md)**
 
-> **Status: 0.1.1.** Tested on Zotero 10 (Linux, git 2.55, git-lfs 3.8) with a
+> **Status: 0.1.2.** Tested on Zotero 10 (Linux, git 2.55, git-lfs 3.8) with a
 > scripted run of two computers taking turns on one repository — edits, deletions,
 > conflicts on both sides, a background sync while behind — followed by *Import from Git*
 > into an empty profile that restored every item and file byte for byte, with one file
