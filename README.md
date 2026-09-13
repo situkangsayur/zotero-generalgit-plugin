@@ -19,9 +19,10 @@ the computer; both write the same repository format.
 > scripted run of two computers taking turns on one repository — edits, deletions,
 > conflicts on both sides, a background sync while behind — followed by *Import from Git*
 > into an empty profile that restored every item and file byte for byte, with one file
-> through Git LFS. Run against a local bare repository and against a Gitea server over
-> HTTPS-style token sign-in. Not yet tested: GitLab, Bitbucket, SSH remotes from inside
-> Zotero, Windows and macOS, Zotero 7–9, group libraries, large libraries. See
+> through Git LFS — all against a local bare repository. A first sync to a Gitea server
+> with an access token also went through, LFS file included. Not yet tested: GitLab,
+> Bitbucket, SSH remotes from inside Zotero, Windows and macOS, Zotero 7–9, group
+> libraries, large libraries. See
 > [CHANGELOG.md](CHANGELOG.md).
 
 ---
