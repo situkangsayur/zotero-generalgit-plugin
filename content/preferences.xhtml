@@ -1,0 +1,243 @@
+<vbox id="zotero-git-sync-prefpane"
+		onload="ZoteroGitSyncPrefs.init()"
+		onunload="ZoteroGitSyncPrefs.uninit()">
+	<vbox class="main-section">
+
+		<groupbox>
+			<label><html:h2>Repository</html:h2></label>
+
+			<html:div class="zgit-hint">
+				Create an empty repository on your Git host first (GitLab, Gitea, Forgejo, Codeberg,
+				Bitbucket, your own server...), then paste its clone address here. The plugin uses
+				the <html:b>git</html:b> installed on this computer, so it signs in the same way
+				<html:span class="zgit-mono">git clone</html:span> does in a terminal: with your SSH
+				key, or with your HTTPS credential helper.
+			</html:div>
+
+			<hbox align="center">
+				<label control="zgit-remote-url" value="Repository address"/>
+				<html:input id="zgit-remote-url" type="text" flex="1"
+						preference="extensions.zotero-git-sync.remoteURL"
+						placeholder="git@gitlab.com:you/zotero-library.git"/>
+			</hbox>
+
+			<hbox align="center">
+				<label control="zgit-branch" value="Branch"/>
+				<html:input id="zgit-branch" type="text" size="20"
+						preference="extensions.zotero-git-sync.branch"/>
+			</hbox>
+
+			<hbox align="center">
+				<label control="zgit-base-path" value="Folder inside the repository"/>
+				<html:input id="zgit-base-path" type="text" flex="1"
+						preference="extensions.zotero-git-sync.basePath"
+						placeholder="zotero (leave empty for the repository root)"/>
+			</hbox>
+
+			<hbox align="center" pack="start">
+				<button id="zgit-test" label="Test connection"
+						oncommand="ZoteroGitSyncPrefs.testConnection()"/>
+			</hbox>
+			<html:div id="zgit-test-status" class="zgit-status"/>
+		</groupbox>
+
+		<groupbox>
+			<label><html:h2>HTTPS sign-in (optional)</html:h2></label>
+
+			<html:div class="zgit-hint">
+				Only needed for an <html:span class="zgit-mono">https://</html:span> address when git
+				on this computer has no credential helper. Use an access token, not your password:
+				GitLab and Gitea/Forgejo call it a personal access token (scopes: read and write
+				repository), Bitbucket an app password or repository access token. The token is
+				stored in Zotero's password manager and sent only to the repository's own server.
+			</html:div>
+
+			<hbox align="center">
+				<label control="zgit-https-username" value="User name"/>
+				<html:input id="zgit-https-username" type="text" flex="1"
+						preference="extensions.zotero-git-sync.httpsUsername"
+						placeholder="your user name (Bitbucket access tokens: x-token-auth)"/>
+			</hbox>
+
+			<hbox align="center">
+				<label control="zgit-token" value="Access token"/>
+				<html:input id="zgit-token" type="password" flex="1"/>
+			</hbox>
+
+			<hbox align="center" pack="start">
+				<button id="zgit-save-token" label="Save token"
+						oncommand="ZoteroGitSyncPrefs.saveToken()"/>
+				<button id="zgit-clear-token" label="Remove token"
+						oncommand="ZoteroGitSyncPrefs.clearToken()"/>
+			</hbox>
+
+			<html:div id="zgit-token-status" class="zgit-status"/>
+		</groupbox>
+
+		<groupbox>
+			<label><html:h2>What gets synced</html:h2></label>
+
+			<checkbox label="Item metadata as JSON (needed for Import from Git)"
+					preference="extensions.zotero-git-sync.exportJSON"/>
+			<checkbox label="Markdown notes with YAML front matter (readable in Obsidian)"
+					preference="extensions.zotero-git-sync.exportMarkdown"/>
+			<checkbox label="Table of contents (index.md and README.md)"
+					preference="extensions.zotero-git-sync.exportIndex"/>
+			<checkbox label="BibTeX export (library.bib)"
+					preference="extensions.zotero-git-sync.exportBibTeX"/>
+			<checkbox label="Child notes"
+					preference="extensions.zotero-git-sync.includeNotes"/>
+			<checkbox label="Group libraries"
+					preference="extensions.zotero-git-sync.includeGroupLibraries"/>
+			<checkbox id="zgit-include-attachments" label="Attachment files (PDFs, books, snapshots, note images)"
+					preference="extensions.zotero-git-sync.includeAttachments"/>
+			<checkbox class="zgit-indent" label="Include linked files stored outside the Zotero data directory"
+					preference="extensions.zotero-git-sync.includeLinkedFiles"/>
+
+			<hbox align="center" class="zgit-indent">
+				<checkbox label="Store files larger than"
+						preference="extensions.zotero-git-sync.lfsEnabled"/>
+				<html:input id="zgit-lfs-threshold" type="text" size="5"
+						preference="extensions.zotero-git-sync.lfsThresholdMB"/>
+				<label value="MB with Git LFS"/>
+			</hbox>
+
+			<hbox align="center" class="zgit-indent">
+				<label control="zgit-max-git-file" value="Largest file to commit to Git itself"/>
+				<html:input id="zgit-max-git-file" type="text" size="5"
+						preference="extensions.zotero-git-sync.maxGitFileMB"/>
+				<label value="MB"/>
+			</hbox>
+
+			<hbox align="center" class="zgit-indent">
+				<label control="zgit-max-attachment" value="Skip attachments larger than"/>
+				<html:input id="zgit-max-attachment" type="text" size="5"
+						preference="extensions.zotero-git-sync.maxAttachmentMB"/>
+				<label value="MB (0 = no limit)"/>
+			</hbox>
+
+			<html:div class="zgit-hint">
+				Git LFS needs <html:span class="zgit-mono">git-lfs</html:span> installed on this computer
+				and LFS enabled for the repository on the host. GitLab.com and GitHub refuse files over
+				100 MB in Git; a self-hosted server may accept more. Hosts also limit total repository
+				and LFS size -- check your plan. Notes, annotations, collections, saved searches and tag
+				colors are always synced.
+			</html:div>
+
+			<checkbox label="Remove files from the repository when their items are deleted"
+					preference="extensions.zotero-git-sync.prune"/>
+			<html:div class="zgit-hint">
+				Only files this plugin wrote are ever removed. Anything else in the repository is
+				left alone.
+			</html:div>
+		</groupbox>
+
+		<groupbox>
+			<label><html:h2>When to sync</html:h2></label>
+
+			<hbox align="center">
+				<checkbox id="zgit-interval-enabled" label="Sync every"
+						preference="extensions.zotero-git-sync.intervalEnabled"/>
+				<html:input id="zgit-interval-minutes" type="text" size="5"
+						preference="extensions.zotero-git-sync.intervalMinutes"/>
+				<label value="minutes"/>
+			</hbox>
+
+			<hbox align="center">
+				<checkbox id="zgit-sync-on-change" label="Sync after the library changes, waiting"
+						preference="extensions.zotero-git-sync.syncOnChange"/>
+				<html:input id="zgit-change-delay" type="text" size="5"
+						preference="extensions.zotero-git-sync.changeDelayMinutes"/>
+				<label value="minutes for edits to settle"/>
+			</hbox>
+
+			<checkbox label="Sync shortly after Zotero starts"
+					preference="extensions.zotero-git-sync.syncOnStartup"/>
+
+			<checkbox label="Sync to Git after Zotero's own sync finishes (the sync button in the toolbar)"
+					preference="extensions.zotero-git-sync.syncAfterZoteroSync"/>
+
+			<html:div class="zgit-hint">
+				A sync that finds nothing to change makes no commit. Background syncs never ask
+				questions: changes that need a decision wait for you on the toolbar button.
+			</html:div>
+		</groupbox>
+
+		<groupbox>
+			<label><html:h2>Commits</html:h2></label>
+
+			<hbox align="center">
+				<label control="zgit-commit-message" value="Message template"/>
+				<html:input id="zgit-commit-message" type="text" flex="1"
+						preference="extensions.zotero-git-sync.commitMessage"/>
+			</hbox>
+			<html:div class="zgit-hint">
+				Placeholders: <html:span class="zgit-mono">{changes} {added} {updated} {deleted}
+				{trigger} {date}</html:span>
+			</html:div>
+
+			<hbox align="center">
+				<label control="zgit-author-name" value="Commit author name (optional)"/>
+				<html:input id="zgit-author-name" type="text" flex="1"
+						preference="extensions.zotero-git-sync.authorName"/>
+			</hbox>
+
+			<hbox align="center">
+				<label control="zgit-author-email" value="Commit author email (optional)"/>
+				<html:input id="zgit-author-email" type="text" flex="1"
+						preference="extensions.zotero-git-sync.authorEmail"/>
+			</hbox>
+			<html:div class="zgit-hint">
+				Leave both empty to use <html:span class="zgit-mono">user.name</html:span> and
+				<html:span class="zgit-mono">user.email</html:span> from your git configuration.
+			</html:div>
+		</groupbox>
+
+		<groupbox>
+			<label><html:h2>Advanced</html:h2></label>
+
+			<hbox align="center">
+				<label control="zgit-git-path" value="git program"/>
+				<html:input id="zgit-git-path" type="text" flex="1"
+						preference="extensions.zotero-git-sync.gitPath"
+						placeholder="found automatically"/>
+			</hbox>
+
+			<hbox align="center">
+				<label control="zgit-local-repo" value="Local copy of the repository"/>
+				<html:input id="zgit-local-repo" type="text" flex="1"
+						preference="extensions.zotero-git-sync.localRepoPath"/>
+			</hbox>
+
+			<hbox align="center">
+				<label control="zgit-web-url" value="Repository web page"/>
+				<html:input id="zgit-web-url" type="text" flex="1"
+						preference="extensions.zotero-git-sync.webURL"
+						placeholder="worked out from the repository address"/>
+			</hbox>
+
+			<html:div class="zgit-hint">
+				The local copy holds the repository's history, compressed, next to your Zotero data
+				directory. It can be deleted while Zotero is closed; the next sync fetches it again.
+			</html:div>
+		</groupbox>
+
+		<groupbox>
+			<label><html:h2>Status</html:h2></label>
+
+			<html:div id="zgit-status" class="zgit-status"/>
+
+			<hbox align="center" pack="start">
+				<button id="zgit-sync-now" label="Sync now"
+						oncommand="ZoteroGitSyncPrefs.syncNow()"/>
+				<button id="zgit-cancel" label="Cancel sync" hidden="true"
+						oncommand="ZoteroGitSyncPrefs.cancel()"/>
+				<button id="zgit-pull" label="Import from Git…"
+						oncommand="ZoteroGitSyncPrefs.pull()"/>
+				<button id="zgit-open-repo" label="Open repository"
+						oncommand="ZoteroGitSyncPrefs.openRepo()"/>
+			</hbox>
+		</groupbox>
+
+	</vbox>
+</vbox>

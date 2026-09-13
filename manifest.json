@@ -1,0 +1,20 @@
+{
+	"manifest_version": 2,
+	"name": "Zotero Git Sync",
+	"version": "0.1.0",
+	"description": "Back up your whole Zotero library -- metadata, notes, annotations and PDFs -- to any Git host (GitLab, Gitea, Forgejo, Bitbucket or your own server) using the git installed on your computer, with Git LFS for large files.",
+	"homepage_url": "https://github.com/situkangsayur/zotero-generalgit-plugin",
+	"author": "situkangsayur",
+	"icons": {
+		"48": "content/icons/git-48.svg",
+		"96": "content/icons/git-96.svg"
+	},
+	"applications": {
+		"zotero": {
+			"id": "zotero-git-sync@situkangsayur.github.io",
+			"update_url": "https://raw.githubusercontent.com/situkangsayur/zotero-generalgit-plugin/main/update.json",
+			"strict_min_version": "6.999",
+			"strict_max_version": "10.*"
+		}
+	}
+}

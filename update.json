@@ -1,0 +1,18 @@
+{
+	"addons": {
+		"zotero-git-sync@situkangsayur.github.io": {
+			"updates": [
+				{
+					"version": "0.1.0",
+					"update_link": "https://github.com/situkangsayur/zotero-generalgit-plugin/releases/download/v0.1.0/zotero-git-sync-0.1.0.xpi",
+					"applications": {
+						"zotero": {
+							"strict_min_version": "6.999",
+							"strict_max_version": "10.*"
+						}
+					}
+				}
+			]
+		}
+	}
+}

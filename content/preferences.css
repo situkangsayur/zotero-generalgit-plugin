@@ -1,0 +1,49 @@
+/* Zotero Git Sync -- preference pane styles
+ *
+ * The stylesheet is injected into the shared preferences document, so every
+ * rule is scoped to the pane to avoid touching Zotero's own panes.
+ */
+
+#zotero-git-sync-prefpane .zgit-hint {
+	margin: 4px 0 8px;
+	opacity: 0.75;
+	font-size: 0.9em;
+	line-height: 1.4;
+	max-width: 60em;
+}
+
+#zotero-git-sync-prefpane .zgit-status {
+	margin: 6px 0;
+	padding: 6px 8px;
+	border-radius: 4px;
+	background: color-mix(in srgb, currentColor 6%, transparent);
+	font-size: 0.9em;
+	line-height: 1.5;
+	white-space: pre-wrap;
+	min-height: 1.5em;
+}
+
+#zotero-git-sync-prefpane .zgit-status.zgit-error {
+	background: color-mix(in srgb, #d7263d 14%, transparent);
+}
+
+#zotero-git-sync-prefpane .zgit-status.zgit-ok {
+	background: color-mix(in srgb, #2e7d32 14%, transparent);
+}
+
+#zotero-git-sync-prefpane .zgit-mono {
+	font-family: monospace;
+}
+
+#zotero-git-sync-prefpane .zgit-indent {
+	margin-inline-start: 22px;
+}
+
+#zotero-git-sync-prefpane hbox > label {
+	margin-inline-end: 6px;
+}
+
+#zotero-git-sync-prefpane input[type="text"],
+#zotero-git-sync-prefpane input[type="password"] {
+	min-width: 12em;
+}
