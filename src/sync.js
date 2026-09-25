@@ -545,7 +545,7 @@ ZoteroGitSync.Sync = {
 		let state = await ZoteroGitSync.State.load(config);
 		let base = state?.base || null;
 		let managed = previousManaged.length ? new Set([...previousManaged, this.FILE_LIST_PATH]) : null;
-		let plan = Planner.plan({ local, remote, base, kept, fullSync: isFullSync, managed });
+		let plan = Planner.plan({ local, remote, base, kept, fullSync: isFullSync, managed, prune: config.prune });
 		await this._resolveDiverged({ plan, repo, remoteFiles, prefix, uploads });
 
 		// -- 2. Decide ---------------------------------------------------------
