@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] — 2026-09-25
+
+### Fixed
+
+Found by running the 0.1.4 fixes in a real Zotero (`scripts/fixes-test/`), which is new here:
+
+- **A deleted item came back as an import when pruning was off.** Its files stayed on the server,
+  as asked, but the sync stopped remembering them, so the next sync offered them as new — and a
+  later sync with pruning on could no longer recognise them as its own to remove. They stay in
+  the sync's record and in `.zotero-sync/files.json`.
+- **"Keep both" never worked for a file in a subfolder.** The new attachment was named after the
+  file's whole path (`page/style.css`), which is not a file name, so it failed with
+  `NS_ERROR_FILE_UNRECOGNIZED_PATH`. It uses the file's own name now, and when one attachment
+  keeps several files each copy is titled with the file it came from.
+
+### Added
+
+- `scripts/fixes-test/`: a headless end-to-end check of all of this against a throwaway
+  repository — pruning on and off, "keep both" for a multi-file attachment, and an import of a
+  branch whose tree holds `<attachment>/../escape.txt`.
+
 ## [0.1.4] — 2026-09-25
 
 ### Fixed
@@ -18,7 +39,7 @@ All notable changes to this project are documented here. The format follows
   the path comes from the server, so each segment is now validated and a bad one is reported as
   a failure instead of written.
 - **"Keep both" could lose the other files of a multi-file attachment.** After importing the
-  repository's copy, the plugin deleted its temporary folder recursively -- and a web snapshot's
+  repository's copy, the plugin deleted its temporary folder recursively — and a web snapshot's
   files share one temporary folder, so the files not yet imported went with it. The folder is
   now removed once, after every copy has been imported.
 

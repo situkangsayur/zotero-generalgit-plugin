@@ -229,6 +229,13 @@ masuknya sama seperti `git clone` di terminal: kunci SSH atau credential helper 
 
 Tutorial lengkap: [docs/TUTORIAL.id.md](docs/TUTORIAL.id.md).
 
+## Contributing
+
+Issues and pull requests are welcome from anyone — a bug report, a fix, a test case, a
+translation. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to build, test and send one.
+*Issue dan pull request terbuka untuk siapa saja; caranya ada di
+[CONTRIBUTING.md](CONTRIBUTING.md).*
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

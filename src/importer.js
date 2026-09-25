@@ -580,9 +580,12 @@ ZoteroGitSync.Importer = {
 		for (let copy of copies) {
 			try {
 				let parentItemID = copy.attachment.parentID || null;
-				let dot = copy.name.lastIndexOf('.');
-				let base = dot > 0 ? copy.name.slice(0, dot) : copy.name;
-				let ext = dot > 0 ? copy.name.slice(dot) : '';
+				// A multi-file attachment's name carries its folder ("page/style.css");
+				// only the file part can go in a file name
+				let fileName = copy.name.split('/').pop();
+				let dot = fileName.lastIndexOf('.');
+				let base = dot > 0 ? fileName.slice(0, dot) : fileName;
+				let ext = dot > 0 ? fileName.slice(dot) : '';
 				let renamed = PathUtils.join(PathUtils.parent(copy.target), `${base} (repository copy)${ext}`);
 				await IOUtils.move(copy.target, renamed);
 				let imported = await Zotero.Attachments.importFromFile({
@@ -590,7 +593,11 @@ ZoteroGitSync.Importer = {
 					parentItemID,
 					libraryID: parentItemID ? undefined : copy.attachment.libraryID,
 					collections: parentItemID ? undefined : copy.attachment.getCollections(),
-					title: `${copy.attachment.getField('title') || base} (repository copy)`,
+					// Several files of one attachment would otherwise all get the
+					// same title
+					title: copies.filter(c => c.attachment.id === copy.attachment.id).length > 1
+						? `${copy.attachment.getField('title') || base}: ${copy.name} (repository copy)`
+						: `${copy.attachment.getField('title') || base} (repository copy)`,
 				});
 				if (imported) {
 					written++;

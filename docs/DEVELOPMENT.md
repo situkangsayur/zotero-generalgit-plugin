@@ -122,6 +122,27 @@ then create the repository with `POST /api/v1/user/repos`.
 `scripts/import-test/` imports an existing repository into an empty headless profile and
 writes a report; set `ZGIT_REMOTE_URL` (and `ZGIT_BASE_PATH`).
 
+`scripts/fixes-test/` checks the three fixes from the 0.1.4 source review, again against a
+bare repository in `~/zgit-fixes`, so no account is involved:
+
+| Step | Profile | What it proves |
+| --- | --- | --- |
+| F1 | A | A library with a multi-file (snapshot-shaped) attachment reaches the repository |
+| F2 | A | With pruning **off**, an item deleted here stays on the server (`deleted` is 0) |
+| F3 | A | With pruning **on**, it goes |
+| F4 | B | An empty profile imports every file of the snapshot |
+| F5 | A | A edits all of the snapshot's files |
+| F6 | B | B edited them too and picks "keep both": every repository copy is kept, not just the first, and no `zgit-copy-*` folder is left in temp |
+| EVIL | -- | The runner grafts `<attachment>/../escape.txt` into the branch with `git mktree` (git will not build such a path from a worktree, but a tree entry named `..` is just bytes) |
+| F7 | C | The import refuses that path: nothing outside the storage folder is written and the warning says so |
+
+```bash
+cd scripts/fixes-test/addon && zip -r /tmp/zgit-fixes-test.xpi . && cd -
+scp build/zotero-git-sync-<version>.xpi host:zgit-fixes/zotero-git-sync.xpi
+scp /tmp/zgit-fixes-test.xpi scripts/fixes-test/run-remote.sh host:zgit-fixes/
+ssh host 'cd ~/zgit-fixes && bash run-remote.sh'
+```
+
 ## Adding things
 
 **A preference.** Default in `prefs.js`, normalized in `Prefs.getConfig()`, a control with
